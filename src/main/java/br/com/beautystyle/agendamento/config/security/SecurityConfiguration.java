@@ -18,11 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@Profile({"prod"})
+@Profile(value = "prod")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    public static final String USERPROFILE_P = "PROFESSIONAL";
-    public static final String USERPROFILE_M = "MODERATOR";
+    public static final String USER_PROFILE_P = "PROFISSIONAL";
+    public static final String USER_PROFILE_C = "CLIENTE";
 
     @Autowired
     private TokenServices tokenServices;
@@ -49,9 +49,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         clientAuthorizeRequests(http);
-        serviceAuthorizeRequests(http);
-        expenseAuthorizeServices(http);
-        eventAuthorizeServices(http);
+        jobAuthorizeRequests(http);
+        expenseAuthorizeRequests(http);
+        categoryAuthorizeRequests(http);
+        eventAuthorizeRequests(http);
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth").permitAll()
                 .anyRequest().authenticated()
@@ -59,6 +60,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(new AutenticationByTokenFilter(tokenServices, repository),
                         UsernamePasswordAuthenticationFilter.class);
+    }
+
+    private void categoryAuthorizeRequests(HttpSecurity http) throws Exception{
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/category/*").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.POST, "/category").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.PUT, "/category").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.DELETE, "/category").hasAnyRole(USER_PROFILE_P);
     }
 
     //Static resources configuration (css, js, img, etc.)
@@ -76,36 +85,35 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private void clientAuthorizeRequests(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/client").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.GET, "/client/*").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.POST, "/client").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.PUT, "/client").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.DELETE, "/client").hasAnyRole(USERPROFILE_P, USERPROFILE_M);
+                .antMatchers(HttpMethod.GET, "/client/*").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.POST, "/client").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C)
+                .antMatchers(HttpMethod.POST, "/client/*").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.PUT, "/client").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C)
+                .antMatchers(HttpMethod.DELETE, "/client").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C);
     }
 
-    private void serviceAuthorizeRequests(HttpSecurity http) throws Exception {
+    private void jobAuthorizeRequests(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/service").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.POST, "/service").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.PUT, "/service").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.DELETE, "/service").hasAnyRole(USERPROFILE_P, USERPROFILE_M);
+                .antMatchers(HttpMethod.GET, "/job/*").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.POST, "/job").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.PUT, "/job").hasAnyRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.DELETE, "/job").hasAnyRole(USER_PROFILE_P);
     }
 
-    private void expenseAuthorizeServices(HttpSecurity http) throws Exception {
+    private void expenseAuthorizeRequests(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/expense").hasRole(USERPROFILE_P)
-                .antMatchers(HttpMethod.GET, "/expense").hasRole(USERPROFILE_P)
-                .antMatchers(HttpMethod.PUT, "/expense").hasRole(USERPROFILE_P)
-                .antMatchers(HttpMethod.DELETE, "/expense").hasRole(USERPROFILE_P);
+                .antMatchers(HttpMethod.POST, "/expense").hasRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.GET, "/expense/*").hasRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.PUT, "/expense").hasRole(USER_PROFILE_P)
+                .antMatchers(HttpMethod.DELETE, "/expense").hasRole(USER_PROFILE_P);
     }
 
-    private void eventAuthorizeServices(HttpSecurity http) throws Exception {
+    private void eventAuthorizeRequests(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/event").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.GET, "/event/*").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.POST, "/event").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.PUT, "/event").hasAnyRole(USERPROFILE_P, USERPROFILE_M)
-                .antMatchers(HttpMethod.DELETE, "/event").hasAnyRole(USERPROFILE_P, USERPROFILE_M);
+                .antMatchers(HttpMethod.GET, "/event/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/event").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C)
+                .antMatchers(HttpMethod.PUT, "/event").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C)
+                .antMatchers(HttpMethod.DELETE, "/event").hasAnyRole(USER_PROFILE_P, USER_PROFILE_C);
     }
 
 }

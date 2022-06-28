@@ -1,6 +1,6 @@
-package br.com.beautystyle.agendamento.model;
+package br.com.beautystyle.agendamento.model.entity;
 
-import br.com.beautystyle.agendamento.repository.ExpenseRepository;
+import br.com.beautystyle.agendamento.model.RepeatOrNot;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,23 +17,23 @@ public class Expense {
     @NotNull
     private BigDecimal price;
     @NotNull
-    private LocalDate date;
-    @Enumerated(EnumType.STRING)
+    private LocalDate expenseDate;
     @NotNull
-    private Category category;
+    private String category;
     @Enumerated(EnumType.STRING)
     @NotNull
     private RepeatOrNot repeatOrNot;
+    @NotNull
+    private Long companyId;
 
-    public Expense update(ExpenseRepository expenseRepository) {
-        Expense expense = expenseRepository.getOne(this.id);
-        expense.setDescription(this.description);
-        expense.setCategory(this.category);
-        expense.setDate(this.date);
-        expense.setPrice(this.price);
-        expense.setRepeatOrNot(this.repeatOrNot);
-        return expense;
+    public long getCompanyId() {
+        return companyId;
     }
+
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
+    }
+
 
     public void setRepeatOrNot(RepeatOrNot repeatOrNot) {
         this.repeatOrNot = repeatOrNot;
@@ -43,9 +43,7 @@ public class Expense {
         return id;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+
 
     public void setDescription(String description) {
         this.description = description;
@@ -55,8 +53,8 @@ public class Expense {
         this.price = price;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setExpenseDate(LocalDate expenseDate) {
+        this.expenseDate = expenseDate;
     }
 
     public void setId(Long id) {
@@ -71,12 +69,20 @@ public class Expense {
         return price;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getExpenseDate() {
+        return expenseDate;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public RepeatOrNot getRepeatOrNot() {

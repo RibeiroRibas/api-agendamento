@@ -1,7 +1,8 @@
 package br.com.beautystyle.agendamento.controller;
 
-import br.com.beautystyle.agendamento.controller.form.JobForm;
-import br.com.beautystyle.agendamento.model.Job;
+import br.com.beautystyle.agendamento.controller.dto.JobDto;
+import br.com.beautystyle.agendamento.model.entity.Job;
+import br.com.beautystyle.agendamento.repository.EventRepository;
 import br.com.beautystyle.agendamento.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/job")
@@ -23,31 +25,35 @@ public class JobController {
     @Autowired
     private JobRepository jobRepository;
 
-    @GetMapping
+    @Autowired
+    private EventRepository eventRepository;
+
+    @GetMapping("/{id}")
     @Cacheable(value = "jobList")
-    public List<Job> findAll() {
-        return jobRepository.findAll();
+    public Set<JobDto> findByCompanyId(@PathVariable Long id) {
+        Set<Job> jobList = jobRepository.findByCompanyId(id);
+        return JobDto.convert(jobList);
     }
 
     @PostMapping
     @Transactional
     @CacheEvict(value = "jobList", allEntries = true)
-    public ResponseEntity<Job> insert(@RequestBody @Valid JobForm jobForm, UriComponentsBuilder uriBuilder) {
-        Job savedJob = jobRepository.save(jobForm.convert());
+    public ResponseEntity<JobDto> insert(@RequestBody @Valid JobDto jobDto, UriComponentsBuilder uriBuilder) {
+        Job savedJob = jobRepository.save(jobDto.convert());
         URI uri = uriBuilder.path("/job/{id}")
                 .buildAndExpand(savedJob.getJobId())
                 .toUri();
-        return ResponseEntity.created(uri).body(savedJob);
+        return ResponseEntity.created(uri).body(new JobDto(savedJob));
     }
 
     @PutMapping
     @Transactional
     @CacheEvict(value = "jobList", allEntries = true)
-    public ResponseEntity<Job> update(@RequestBody @Valid Job job){
-        Optional<Job> jobOptional = jobRepository.findById(job.getJobId());
+    public ResponseEntity<?> update(@RequestBody @Valid JobDto jobDto){
+        Optional<Job> jobOptional = jobRepository.findById(jobDto.getApiId());
         if(jobOptional.isPresent()){
-            Job jobUpdated = job.update(jobRepository);
-            return ResponseEntity.ok(jobUpdated);
+            jobDto.update(jobRepository);
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
     }
@@ -58,6 +64,7 @@ public class JobController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Optional<Job> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
+            jobOptional.get().removeAssociation(jobRepository,eventRepository);
             jobRepository.deleteById(id);
             return ResponseEntity.ok().build();
         }

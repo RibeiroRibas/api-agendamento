@@ -3,6 +3,7 @@ package br.com.beautystyle.agendamento.controller.form;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class LoginForm {
+
     private String email;
     private String password;
 

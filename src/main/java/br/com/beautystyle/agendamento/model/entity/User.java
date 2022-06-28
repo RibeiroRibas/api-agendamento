@@ -1,5 +1,6 @@
-package br.com.beautystyle.agendamento.model;
+package br.com.beautystyle.agendamento.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,11 +16,30 @@ public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String name;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
+    @NotNull
+    private String phone;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    @JsonIgnore
+    @NotNull
+    private Address address;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Profile> profiles = new ArrayList<>();
+    @NotNull
+    private List<Profiles> profiles = new ArrayList<>();
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     @Override
     public int hashCode() {
@@ -75,12 +95,20 @@ public class User implements UserDetails{
         this.password = password;
     }
 
-    public List<Profile> getProfiles() {
+    public List<Profiles> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(List<Profile> profiles) {
-        this.profiles = profiles;
+    public void setProfiles(Profiles profiles) {
+        this.profiles.add(profiles);
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override

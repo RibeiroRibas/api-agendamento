@@ -1,6 +1,6 @@
 package br.com.beautystyle.agendamento.config.security;
 
-import br.com.beautystyle.agendamento.model.User;
+import br.com.beautystyle.agendamento.model.entity.User;
 import br.com.beautystyle.agendamento.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

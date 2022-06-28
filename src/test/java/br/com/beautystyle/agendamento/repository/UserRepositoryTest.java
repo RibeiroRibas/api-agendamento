@@ -1,7 +1,6 @@
 package br.com.beautystyle.agendamento.repository;
 
-import br.com.beautystyle.agendamento.model.User;
-import org.junit.jupiter.api.Test;
+import br.com.beautystyle.agendamento.model.entity.User;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
