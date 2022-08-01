@@ -1,11 +1,11 @@
 --INSERT INTO USER(name, email, password) VALUES('Profissional', 'profissional@email.com', '$2a$10$n//D1acfPXQxzNqKQlIgn.geqIie.hXPzFWfkPcfn7Xg/cyIpyQu.');
-INSERT INTO ADDRESS(street,number,zip_code,city,state,country) VALUES('rua manoel candido de farias',60,'88131604','palhoca','SC','BR');
+INSERT INTO address (street,number,zip_code,city,state,country) VALUES('rua manoel candido de farias',60,'88131604','palhoca','SC','BR');
 
 INSERT INTO PROFILES(name_profile) VALUES('ROLE_PROFISSIONAL');
 INSERT INTO PROFILES(name_profile) VALUES('ROLE_CLIENTE');
 
-INSERT INTO USER(name, email, password,phone,address_id) VALUES('Patricia Forkamp', 'profissional@email.com', '$2a$10$n//D1acfPXQxzNqKQlIgn.geqIie.hXPzFWfkPcfn7Xg/cyIpyQu.','48996417323',1);
-INSERT INTO USER_PROFILES(user_id,profiles_id) VALUES(1,1);
+INSERT INTO user (name, email, password,phone,address_id) VALUES('Patricia Forkamp', 'profissional@email.com', '$2a$10$n//D1acfPXQxzNqKQlIgn.geqIie.hXPzFWfkPcfn7Xg/cyIpyQu.','48996417323',1);
+INSERT INTO user_profiles (user_id,profiles_id) VALUES(1,1);
 
 INSERT INTO COMPANY(cnpj,name,user_id,address_id) VALUES('20643340000148','Beauty Style',1,1);
 

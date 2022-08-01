@@ -39,6 +39,16 @@ public class ExpenseController {
         return ReportDto.convertExpenseList(expenseList);
     }
 
+    @GetMapping("/{id}/{startDate}/{endDate}")
+    public List<ExpenseDto> getByPeriod(@PathVariable Long id,
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate startDate,
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate endDate) {
+        List<Expense> expenseList =
+                expenseRepository.findByCompanyIdEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
+                        id, startDate, endDate);
+        return ExpenseDto.convert(expenseList);
+    }
+
     @GetMapping("/report/{id}/{date}")
     public List<ReportDto> getReportByDate(@PathVariable Long id,
                                             @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate date) {

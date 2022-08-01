@@ -13,7 +13,7 @@ public class ReportDto {
     private String clientName;
     private LocalDate date;
     private BigDecimal eventValue;
-    private String expenceCategory;
+    private String expenseCategory;
     private BigDecimal expenseValue;
 
     public ReportDto() {
@@ -22,7 +22,7 @@ public class ReportDto {
     public ReportDto(Expense expense) {
         this.date = expense.getExpenseDate();
         this.expenseValue = expense.getPrice();
-        this.expenceCategory = expense.getCategory();
+        this.expenseCategory = expense.getCategory();
     }
 
     public ReportDto(Event event) {
@@ -63,12 +63,12 @@ public class ReportDto {
         this.eventValue = eventValue;
     }
 
-    public String getExpenceCategory() {
-        return expenceCategory;
+    public String getExpenseCategory() {
+        return expenseCategory;
     }
 
-    public void setExpenceCategory(String expenceCategory) {
-        this.expenceCategory = expenceCategory;
+    public void setExpenseCategory(String expenseCategory) {
+        this.expenseCategory = expenseCategory;
     }
 
     public BigDecimal getExpenseValue() {

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
-@Profile(value = "prod")
+@Profile({"dev","prod"})
 public class AutenticationController {
     @Autowired
     private AuthenticationManager authManager;

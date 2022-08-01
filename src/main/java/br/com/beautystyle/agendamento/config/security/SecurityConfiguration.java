@@ -18,11 +18,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@Profile(value = "prod")
+@Profile({"dev","prod"})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public static final String USER_PROFILE_P = "PROFISSIONAL";
-    public static final String USER_PROFILE_C = "CLIENTE";
+    public static final String USER_PROFILE_C = "COSTUMER";
+    public static final String USER_PROFILE_F = "FREE_ACCOUNT";
 
     @Autowired
     private TokenServices tokenServices;
