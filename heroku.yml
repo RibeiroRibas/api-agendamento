@@ -14,7 +14,7 @@ services:
             container_name: app_agendamento
             environment:
                 - SPRING_PROFILES_ACTIVE=prod
-                - AGENDAMENTO_DATABASE_URL=jdbc:mysql://172.19.0.2:3306/agendamento_db?createDatabaseIfNotExist=true
+                - AGENDAMENTO_DATABASE_URL=jdbc:mysql://172.19.0.2:3306/agendamento_db
                 - AGENDAMENTO_DATABASE_USERNAME=root
                 - AGENDAMENTO_DATABASE_PASSWORD=ribasnight8426
                 - AGENDAMENTO_JWT_SECRET=ribasnight8426
