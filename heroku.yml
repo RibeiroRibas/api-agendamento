@@ -1,14 +1,5 @@
 version: "3.9"
 services:
-        mysqldb:
-            image: mysql
-            container_name: meu-mysql
-            environment:
-                - MYSQL_ROOT_PASSWORD=ribasnight8426
-            volumes:
-                - agendamento_volume:/var/lib/mysql
-            networks:
-                - compose-bridge   
         agendamento:
             image: ribeiroribas/agendamento
             container_name: app_agendamento
@@ -25,9 +16,3 @@ services:
                 - 8082:8081 
             depends_on:
                 - mysqldb
-volumes:
-    agendamento_volume:
-        external: false
-networks:
-  compose-bridge:
-    driver: bridge
