@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+
+
 @Entity
 public class Profiles implements GrantedAuthority {
 
@@ -15,17 +17,7 @@ public class Profiles implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    private String nameProfile; // cliente, profisional
-
-    public Profiles(String nameProfile) {
-        if(nameProfile.equals("ROLE_PROFISSIONAL")){
-            this.id = 1L;
-
-        }else{
-            this.id = 2L;
-        }
-        this.nameProfile=nameProfile;
-    }
+    private String profileName;
 
     public Profiles() {
     }
@@ -38,16 +30,16 @@ public class Profiles implements GrantedAuthority {
         this.id = id;
     }
 
-    public String getNameProfile() {
-        return nameProfile;
+    public String getProfileName() {
+        return profileName;
     }
 
-    public void setNameProfile(String nameProfile) {
-        this.nameProfile = nameProfile;
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
     }
 
     @Override
     public String getAuthority() {
-        return this.nameProfile;
+        return this.profileName;
     }
 }

@@ -1,34 +1,43 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
-import br.com.beautystyle.agendamento.model.entity.Client;
 import br.com.beautystyle.agendamento.model.entity.Event;
-import br.com.beautystyle.agendamento.model.entity.Job;
-import br.com.beautystyle.agendamento.repository.ClientRepository;
-import br.com.beautystyle.agendamento.repository.EventRepository;
-import br.com.beautystyle.agendamento.repository.JobRepository;
+import br.com.beautystyle.agendamento.model.entity.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EventFinalDto {
 
     private EventDto event;
-    private ClientDto client;
+    private CustomerDto customer;
     private Set<JobDto> jobs;
 
     public EventFinalDto(Event event) {
         this.event = new EventDto(event);
-        this.client = new ClientDto(event.getClient());
-        this.jobs = JobDto.convert(event.getJobList());
+        this.customer = new CustomerDto(event.getCostumer());
+        this.jobs = JobDto.convertList(event.getJobs());
+    }
+
+    public EventFinalDto(Schedule schedule) {
+        this.event = new EventDto(schedule);
+        this.customer = new CustomerDto(schedule.getCustomer());
+        this.jobs = JobDto.convert(schedule.getJobs());
     }
 
     public static List<EventFinalDto> convertList(List<Event> events) {
-        return events.stream().map(EventFinalDto::new).collect(Collectors.toList());
+        List<EventFinalDto> eventsFinalDto = new ArrayList<>();
+        events.forEach(event -> eventsFinalDto.add(new EventFinalDto(event)));
+        return eventsFinalDto;
     }
 
     public EventFinalDto() {
+    }
+
+    public static List<EventFinalDto> convert(List<Schedule> schedules) {
+        List<EventFinalDto> eventsFinalDto = new ArrayList<>();
+        schedules.forEach(schedule -> eventsFinalDto.add(new EventFinalDto(schedule)));
+        return eventsFinalDto;
     }
 
     public EventDto getEvent() {
@@ -39,12 +48,12 @@ public class EventFinalDto {
         this.event = event;
     }
 
-    public ClientDto getClient() {
-        return client;
+    public CustomerDto getCustomer() {
+        return customer;
     }
 
-    public void setClient(ClientDto client) {
-        this.client = client;
+    public void setCustomer(CustomerDto customer) {
+        this.customer = customer;
     }
 
     public Set<JobDto> getJobs() {
@@ -53,19 +62,6 @@ public class EventFinalDto {
 
     public void setJobs(Set<JobDto> jobs) {
         this.jobs = jobs;
-    }
-
-    public void update(EventRepository eventRepository, JobRepository jobRepository) {
-        EventDto eventDto = this.event;
-        Event event = eventRepository.getById(eventDto.getApiId());
-        event.setEventDate(eventDto.getEventDate());
-        event.setValueEvent(eventDto.getValueEvent());
-        event.setStartTime(eventDto.getStarTime());
-        event.setEndTime(eventDto.getEndTime());
-        event.setStatusPagamento(eventDto.getStatusPagamento());
-        event.setClient(new Client(this.client));
-        event.getJobList().forEach(job-> job.removeEvent(jobRepository,event));
-        event.setJobList(Job.convert(this.jobs));
     }
 
 }

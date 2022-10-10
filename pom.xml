@@ -12,10 +12,12 @@
     <artifactId>agendamento</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>agendamento</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Aplicativo de Agendamentoo</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -71,13 +73,19 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.7</version>
+            <version>1.6.9</version>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.1.4.Final</version>
         </dependency>
 
     </dependencies>

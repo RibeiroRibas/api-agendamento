@@ -1,6 +1,6 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import br.com.beautystyle.agendamento.repository.CategoryRepository;
+import br.com.beautystyle.agendamento.controller.form.CategoryForm;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +17,20 @@ public class Category {
     @NotNull
     private String name;
     @NotNull
-    private Long companyId;
+    private Long tenant;
+
+    public Category() {
+    }
+
+    public Category(String name, Long tenant) {
+        this.name = name;
+        this.tenant = tenant;
+    }
+
+    public Category(CategoryForm categoryForm) {
+        this.name = categoryForm.getName();
+        this.tenant = categoryForm.getTenant();
+    }
 
     public Long getApiId() {
         return apiId;
@@ -35,18 +48,16 @@ public class Category {
         this.name = name;
     }
 
-    public Long getCompanyId() {
-        return companyId;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
-    public Category update(CategoryRepository categoryRepository) {
-        Category category = categoryRepository.getById(this.apiId);
-        category.setName(this.name);
-        category.setCompanyId(this.companyId);
-        return category;
+
+    public boolean isTenantNotEquals(Long tenant) {
+        return !this.tenant.equals(tenant);
     }
 }

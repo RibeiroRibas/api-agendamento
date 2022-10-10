@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public class ReportDto {
 
+    private Long apiId;
     private String clientName;
     private LocalDate date;
     private BigDecimal eventValue;
@@ -21,14 +22,16 @@ public class ReportDto {
 
     public ReportDto(Expense expense) {
         this.date = expense.getExpenseDate();
-        this.expenseValue = expense.getPrice();
+        this.expenseValue = expense.getValue();
         this.expenseCategory = expense.getCategory();
+        this.apiId = expense.getId();
     }
 
     public ReportDto(Event event) {
         this.date = event.getEventDate();
-        this.eventValue = event.getValueEvent();
-        this.clientName = event.getClient().getName();
+        this.eventValue = event.getValue();
+        this.clientName = event.getCostumer().getName();
+        this.apiId = event.getId();
     }
 
     public static List<ReportDto> convertExpenseList(List<Expense> expenseList) {
@@ -77,5 +80,13 @@ public class ReportDto {
 
     public void setExpenseValue(BigDecimal expenseValue) {
         this.expenseValue = expenseValue;
+    }
+
+    public Long getApiId() {
+        return apiId;
+    }
+
+    public void setApiId(Long apiId) {
+        this.apiId = apiId;
     }
 }

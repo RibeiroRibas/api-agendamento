@@ -1,5 +1,6 @@
 package br.com.beautystyle.agendamento.model.entity;
 
+import br.com.beautystyle.agendamento.controller.form.ExpenseForm;
 import br.com.beautystyle.agendamento.model.RepeatOrNot;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ public class Expense {
     private Long id;
     private String description;
     @NotNull
-    private BigDecimal price;
+    private BigDecimal value;
     @NotNull
     private LocalDate expenseDate;
     @NotNull
@@ -24,16 +25,19 @@ public class Expense {
     @NotNull
     private RepeatOrNot repeatOrNot;
     @NotNull
-    private Long companyId;
+    private Long tenant;
 
-    public long getCompanyId() {
-        return companyId;
+    public Expense() {
     }
 
-    public void setCompanyId(long companyId) {
-        this.companyId = companyId;
+    public Expense(ExpenseForm expenseForm) {
+        this.description = expenseForm.getDescription();
+        this.value = expenseForm.getValue();
+        this.expenseDate = expenseForm.getExpenseDate();
+        this.category = expenseForm.getCategory();
+        this.repeatOrNot = expenseForm.getRepeatOrNot();
+        this.tenant = expenseForm.getTenant();
     }
-
 
     public void setRepeatOrNot(RepeatOrNot repeatOrNot) {
         this.repeatOrNot = repeatOrNot;
@@ -43,14 +47,12 @@ public class Expense {
         return id;
     }
 
-
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setValue(BigDecimal value) {
+        this.value = value;
     }
 
     public void setExpenseDate(LocalDate expenseDate) {
@@ -65,8 +67,8 @@ public class Expense {
         return description;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getValue() {
+        return value;
     }
 
     public LocalDate getExpenseDate() {
@@ -81,11 +83,19 @@ public class Expense {
         this.category = category;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public void setTenant(Long companyId) {
+        this.tenant = companyId;
+    }
+
+    public Long getTenant() {
+        return tenant;
     }
 
     public RepeatOrNot getRepeatOrNot() {
         return repeatOrNot;
+    }
+
+    public boolean isTenantNotEquals(Long tenant) {
+        return !this.tenant.equals(tenant);
     }
 }

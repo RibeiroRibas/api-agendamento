@@ -1,13 +1,17 @@
 package br.com.beautystyle.agendamento.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
     @NotNull
     private String street;
@@ -25,6 +29,10 @@ public class Address {
     public Address() {
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getZipCode() {
         return zipCode;
     }
@@ -33,12 +41,8 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getStreet() {
@@ -79,5 +83,23 @@ public class Address {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return number == address.number
+                && Objects.equals(id, address.id)
+                && Objects.equals(street, address.street)
+                && Objects.equals(zipCode, address.zipCode)
+                && Objects.equals(city, address.city)
+                && Objects.equals(state, address.state)
+                && Objects.equals(country, address.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, street, number, zipCode, city, state, country);
     }
 }

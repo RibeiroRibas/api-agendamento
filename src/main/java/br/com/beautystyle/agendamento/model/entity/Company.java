@@ -1,6 +1,6 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import br.com.beautystyle.agendamento.model.CompanyType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,19 +12,31 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    private String cnpj;
+    private String rn;
     @NotNull
     private String name;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
+    @Enumerated(EnumType.STRING)
     @NotNull
-    private User user;
-    @OneToOne
-    @JoinColumn(name = "address_id")
-    @JsonIgnore
+    private CompanyType type;
+    @OneToOne(mappedBy = "company")
+    private UserProfessional professional;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
     @NotNull
     private Address address;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "business_hours_id", referencedColumnName = "id")
+    @NotNull
+    private BusinessHours businessHours;
+
+
+    public BusinessHours getBusinessHours() {
+        return businessHours;
+    }
+
+    public void setBusinessHours(BusinessHours businessHours) {
+        this.businessHours = businessHours;
+    }
 
     public Long getId() {
         return id;
@@ -34,12 +46,12 @@ public class Company {
         this.id = id;
     }
 
-    public String getCnpj() {
-        return cnpj;
+    public String getRn() {
+        return rn;
     }
 
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
+    public void setRn(String rn) {
+        this.rn = rn;
     }
 
     public String getName() {
@@ -50,12 +62,12 @@ public class Company {
         this.name = name;
     }
 
-    public User getUser() {
-        return user;
+    public UserProfessional getProfessional() {
+        return professional;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setProfessional(UserProfessional professional) {
+        this.professional = professional;
     }
 
     public Address getAddress() {
@@ -64,5 +76,13 @@ public class Company {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public CompanyType getType() {
+        return type;
+    }
+
+    public void setType(CompanyType type) {
+        this.type = type;
     }
 }

@@ -1,6 +1,5 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,9 +8,12 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-public class User implements UserDetails{
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user")
+public abstract class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +27,16 @@ public class User implements UserDetails{
     @NotNull
     private String phone;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    @JsonIgnore
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
     @NotNull
     private Address address;
+
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_profiles",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "profiles_id")})
     @NotNull
-    private List<Profiles> profiles = new ArrayList<>();
+    private final List<Profiles> profiles = new ArrayList<>();
 
     public String getPhone() {
         return phone;
@@ -51,19 +56,14 @@ public class User implements UserDetails{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        User other = (User) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User otherUser = (User) obj;
+        return Objects.equals(id, otherUser.id)
+                && Objects.equals(name, otherUser.name)
+                && Objects.equals(password, otherUser.password)
+                && Objects.equals(email, otherUser.email)
+                && Objects.equals(phone, otherUser.phone)
+                && Objects.equals(address, otherUser.address);
     }
 
     public Long getId() {
@@ -90,7 +90,6 @@ public class User implements UserDetails{
         this.email = email;
     }
 
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -99,8 +98,11 @@ public class User implements UserDetails{
         return profiles;
     }
 
-    public void setProfiles(Profiles profiles) {
-        this.profiles.add(profiles);
+    public void setProfiles(Profiles profile) {
+        if (profile != null) {
+            this.profiles.clear();
+            this.profiles.add(profile);
+        }
     }
 
     public Address getAddress() {
@@ -126,28 +128,24 @@ public class User implements UserDetails{
         return this.profiles;
     }
 
-    //se a conta está exppirada, no ~caso com o acesso a alguns recursos bloqueados
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    //se a conta está bloqueada
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-
-    //credenciada
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    //esta disponível
     @Override
     public boolean isEnabled() {
         return true;
     }
+
 }

@@ -2,10 +2,19 @@ package br.com.beautystyle.agendamento.controller.form;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import javax.validation.constraints.NotNull;
+
 public class LoginForm {
 
+    @NotNull
     private String email;
+    @NotNull
     private String password;
+
+    public LoginForm(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     public void setEmail(String email) {
         this.email = email;

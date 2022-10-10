@@ -1,28 +1,30 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
 import br.com.beautystyle.agendamento.model.entity.Job;
-import br.com.beautystyle.agendamento.repository.JobRepository;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import br.com.beautystyle.agendamento.model.entity.JobTest;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JobDto {
 
     private Long apiId;
-    @NotNull
     private String name;
-    @NotNull
-    private BigDecimal valueOfJob;
-    @JsonFormat(shape = JsonFormat.Shape.ARRAY, pattern = "HH:mm:ss")
+    private BigDecimal price;
     private LocalTime durationTime;
-    private Long companyId;
+    private Long tenant;
 
-    public static Set<JobDto> convert(Set<Job> jobList) {
+    public JobDto(JobTest job) {
+        this.apiId = job.getId();
+        this.name = job.getName();
+        this.price = job.getPrice();
+        this.durationTime = job.getDurationTime();
+        this.tenant = job.getTenant();
+    }
+
+    public static Set<JobDto> convertList(Set<Job> jobList) {
         return jobList.stream().map(JobDto::new).collect(Collectors.toSet());
     }
 
@@ -30,11 +32,15 @@ public class JobDto {
     }
 
     public JobDto(Job job) {
-        this.apiId = job.getJobId();
-        this.companyId = job.getCompanyId();
+        this.apiId = job.getId();
         this.name = job.getName();
-        this.valueOfJob = job.getValueOfJob();
+        this.price = job.getPrice();
         this.durationTime = job.getDurationTime();
+        this.tenant = job.getTenant();
+    }
+
+    public static Set<JobDto> convert(Set<JobTest> jobs) {
+        return jobs.stream().map(JobDto::new).collect(Collectors.toSet());
     }
 
     public Long getApiId() {
@@ -43,14 +49,6 @@ public class JobDto {
 
     public void setApiId(Long apiId) {
         this.apiId = apiId;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
     }
 
     public LocalTime getDurationTime() {
@@ -69,28 +67,28 @@ public class JobDto {
         return name;
     }
 
-    public void setValueOfJob(BigDecimal valueOfJob) {
-        this.valueOfJob = valueOfJob;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
-    public BigDecimal getValueOfJob() {
-        return valueOfJob;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public Job convert() {
+    public Long getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
+    }
+
+    public Job convertList() {
         Job job = new Job();
         job.setName(this.name);
         job.setDurationTime(this.durationTime);
-        job.setValueOfJob(this.valueOfJob);
-        job.setCompanyId(this.companyId);
+        job.setPrice(this.price);
         return job;
-    }
-
-    public void update(JobRepository jobRepository) {
-        Job job = jobRepository.getById(this.apiId);
-        job.setName(this.name);
-        job.setValueOfJob(this.valueOfJob);
-        job.setDurationTime(this.durationTime);
     }
 
 }

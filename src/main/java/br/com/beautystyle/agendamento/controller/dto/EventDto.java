@@ -1,47 +1,43 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
-import br.com.beautystyle.agendamento.model.entity.Client;
 import br.com.beautystyle.agendamento.model.entity.Event;
-import br.com.beautystyle.agendamento.model.entity.Job;
-import br.com.beautystyle.agendamento.model.StatusPagamento;
-import br.com.beautystyle.agendamento.repository.EventRepository;
+import br.com.beautystyle.agendamento.model.entity.Schedule;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EventDto {
 
     private Long apiId;
     private LocalDate eventDate;
-    private LocalTime starTime;
+    private LocalTime startTime;
     private LocalTime endTime;
-    private BigDecimal valueEvent;
-    private StatusPagamento statusPagamento;
-    private Long companyId;
+    private BigDecimal value;
+    private Long tenant;
+    private boolean hasPaymentReceived;
 
     public EventDto() {
     }
 
     public EventDto(Event event) {
-        this.apiId = event.getEventId();
+        this.apiId = event.getId();
         this.eventDate = event.getEventDate();
-        this.starTime = event.getStartTime();
+        this.startTime = event.getStartTime();
         this.endTime = event.getEndTime();
-        this.valueEvent = event.getValueEvent();
-        this.statusPagamento = event.getStatusPagamento();
-        this.companyId = event.getCompanyId();
+        this.value = event.getValue();
+        this.tenant = event.getTenant();
+        this.hasPaymentReceived = event.isHasPaymentReceived();
     }
 
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public EventDto(Schedule schedule) {
+        this.apiId = schedule.getId();
+        this.eventDate = schedule.getDate();
+        this.startTime = schedule.getStartTime();
+        this.endTime = schedule.getEndTime();
+        this.value = schedule.getPrice();
+        this.tenant = schedule.getTenant();
+        this.hasPaymentReceived = schedule.isHasPaymentReceived();
     }
 
     public Long getApiId() {
@@ -60,12 +56,12 @@ public class EventDto {
         this.eventDate = eventDate;
     }
 
-    public LocalTime getStarTime() {
-        return starTime;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setStarTime(LocalTime starTime) {
-        this.starTime = starTime;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 
     public LocalTime getEndTime() {
@@ -76,52 +72,27 @@ public class EventDto {
         this.endTime = endTime;
     }
 
-    public BigDecimal getValueEvent() {
-        return valueEvent;
+    public BigDecimal getValue() {
+        return value;
     }
 
-    public void setValueEvent(BigDecimal valueEvent) {
-        this.valueEvent = valueEvent;
+    public void setValue(BigDecimal value) {
+        this.value = value;
     }
 
-    public StatusPagamento getStatusPagamento() {
-        return statusPagamento;
+    public void setHasPaymentReceived(boolean hasPaymentReceived) {
+        this.hasPaymentReceived = hasPaymentReceived;
     }
 
-    public void setStatusPagamento(StatusPagamento statusPagamento) {
-        this.statusPagamento = statusPagamento;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public boolean isTimeAvaliable(List<Event> eventList) {
-        return isStartTimeAvaliable(eventList) && isEndTimeAvaliable(eventList);
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
-    public boolean isEndTimeAvaliable(List<Event> eventList) {
-        for (Event ev : eventList) {
-            if (ev.getStartTime().isAfter(getStarTime())
-                    && getEndTime().isAfter(ev.getStartTime())) {
-                this.apiId = 0L;
-                this.endTime = ev.getStartTime();
-                return false;
-            }
-        }
-        return true;
+    public boolean isHasPaymentReceived() {
+        return hasPaymentReceived;
     }
-
-    public boolean isStartTimeAvaliable(List<Event> eventList) {
-        if (checkStartTime(eventList)) {return true;}
-        this.apiId = 0L;
-        this.endTime = null;
-        return false;
-    }
-
-    private boolean checkStartTime(List<Event> eventList) {
-        return eventList.stream()
-                .filter(ev -> !ev.getEventId().equals(getApiId()))
-                .anyMatch(event1 -> !getStarTime().isBefore(event1.getStartTime()) &&
-                        getStarTime().isBefore(event1.getEndTime()));
-    }
-
-
-
 }

@@ -4,9 +4,6 @@ import br.com.beautystyle.agendamento.model.entity.Expense;
 import br.com.beautystyle.agendamento.model.RepeatOrNot;
 import br.com.beautystyle.agendamento.repository.ExpenseRepository;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,36 +11,25 @@ import java.util.stream.Collectors;
 
 public class ExpenseDto {
 
-
     private Long apiId;
     private String description;
-    @NotNull
-    private BigDecimal price;
-    @NotNull
+    private BigDecimal value;
     private LocalDate expenseDate;
-    @Enumerated(EnumType.STRING)
-    @NotNull
     private String category;
-    @Enumerated(EnumType.STRING)
-    @NotNull
     private RepeatOrNot repeatOrNot;
-    private Long companyId;
+    private Long tenant;
+
+    public ExpenseDto() {
+    }
 
     public ExpenseDto(Expense savedExpense) {
         this.apiId = savedExpense.getId();
         this.description = savedExpense.getDescription();
-        this.price = savedExpense.getPrice();
+        this.value = savedExpense.getValue();
         this.expenseDate = savedExpense.getExpenseDate();
         this.category = savedExpense.getCategory();
         this.repeatOrNot = savedExpense.getRepeatOrNot();
-        this.companyId = savedExpense.getCompanyId();
-    }
-
-    public static List<ExpenseDto> convert(List<Expense> expenseList) {
-        return expenseList.stream().map(ExpenseDto::new).collect(Collectors.toList());
-    }
-
-    public ExpenseDto() {
+        this.tenant = savedExpense.getTenant();
     }
 
     public Long getApiId() {
@@ -58,8 +44,8 @@ public class ExpenseDto {
         this.description = description;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setValue(BigDecimal value) {
+        this.value = value;
     }
 
     public void setExpenseDate(LocalDate expenseDate) {
@@ -78,20 +64,20 @@ public class ExpenseDto {
         this.repeatOrNot = repeatOrNot;
     }
 
-    public Long getCompanyId() {
-        return companyId;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getValue() {
+        return value;
     }
 
     public LocalDate getExpenseDate() {
@@ -103,14 +89,18 @@ public class ExpenseDto {
         return repeatOrNot;
     }
 
+    public static List<ExpenseDto> convert(List<Expense> expenseList) {
+        return expenseList.stream().map(ExpenseDto::new).collect(Collectors.toList());
+    }
+
     public Expense convert(){
         Expense expense = new Expense();
         expense.setRepeatOrNot(this.repeatOrNot);
-        expense.setPrice(this.price);
+        expense.setValue(this.value);
         expense.setCategory(this.category);
         expense.setDescription(this.description);
         expense.setExpenseDate(this.expenseDate);
-        expense.setCompanyId(this.companyId);
+        expense.setTenant(this.tenant);
         return expense;
     }
 
@@ -119,7 +109,7 @@ public class ExpenseDto {
             expense.setDescription(this.description);
             expense.setCategory(this.category);
             expense.setExpenseDate(this.expenseDate);
-            expense.setPrice(this.price);
+            expense.setValue(this.value);
             expense.setRepeatOrNot(this.repeatOrNot);
             return expense;
     }

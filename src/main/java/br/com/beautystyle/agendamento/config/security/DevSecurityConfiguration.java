@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @EnableWebSecurity
 @Configuration
-@Profile(value = "test")
+@Profile("dev")
 public class DevSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
@@ -18,6 +18,4 @@ public class DevSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .and().csrf().disable();
     }
-
-
 }

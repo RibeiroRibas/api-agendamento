@@ -1,7 +1,9 @@
 package br.com.beautystyle.agendamento.controller;
 
+import br.com.beautystyle.agendamento.config.security.TokenServices;
 import br.com.beautystyle.agendamento.controller.dto.ExpenseDto;
-import br.com.beautystyle.agendamento.controller.dto.ReportDto;
+import br.com.beautystyle.agendamento.controller.exceptions.TenantNotEqualsException;
+import br.com.beautystyle.agendamento.controller.form.ExpenseForm;
 import br.com.beautystyle.agendamento.model.entity.Expense;
 import br.com.beautystyle.agendamento.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -22,45 +26,35 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static br.com.beautystyle.agendamento.controller.ConstantsController.*;
+
 @RestController
 @RequestMapping("/expense")
 public class ExpenseController {
 
     @Autowired
     private ExpenseRepository expenseRepository;
+    @Autowired
+    private TokenServices tokenServices;
 
-    @GetMapping("/report/{id}/{startDate}/{endDate}")
-    public List<ReportDto> getReportByPerid(@PathVariable Long id,
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate startDate,
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate endDate) {
+    @GetMapping("/{startDate}/{endDate}")
+    public ResponseEntity<List<ExpenseDto>> getByPeriod(@DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate startDate,
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate endDate,
+                                                        HttpServletRequest request) {
+        Long tenant = tokenServices.getTenant(request);
         List<Expense> expenseList =
-                expenseRepository.findByCompanyIdEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
-                        id, startDate, endDate);
-        return ReportDto.convertExpenseList(expenseList);
+                expenseRepository.findByTenantEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
+                        tenant, startDate, endDate);
+        return ResponseEntity.ok(ExpenseDto.convert(expenseList));
     }
 
-    @GetMapping("/{id}/{startDate}/{endDate}")
-    public List<ExpenseDto> getByPeriod(@PathVariable Long id,
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate startDate,
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate endDate) {
-        List<Expense> expenseList =
-                expenseRepository.findByCompanyIdEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
-                        id, startDate, endDate);
-        return ExpenseDto.convert(expenseList);
-    }
 
-    @GetMapping("/report/{id}/{date}")
-    public List<ReportDto> getReportByDate(@PathVariable Long id,
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate date) {
-        List<Expense> expenseList = expenseRepository.findByCompanyIdAndExpenseDate(id,date);
-        return ReportDto.convertExpenseList(expenseList);
-    }
-
-    @GetMapping("/{companyId}")
+    @GetMapping
     @Cacheable(value = "years")
-    public List<String> getByYearsList(@PathVariable Long companyId) {
-        List<LocalDate> expenses = expenseRepository.getYearsList(companyId);
-        return expenses.stream()
+    public List<String> getByYearsList(HttpServletRequest request) {
+        Long tenant = tokenServices.getTenant(request);
+        List<LocalDate> expensesDate = expenseRepository.getYearsListByTenant(tenant);
+        return expensesDate.stream()
                 .map(LocalDate::getYear)
                 .distinct()
                 .sorted(Comparator.comparing(Integer::intValue))
@@ -71,36 +65,49 @@ public class ExpenseController {
     @PostMapping
     @Transactional
     @CacheEvict(value = {"expenseList", "years"}, allEntries = true)
-    public ResponseEntity<ExpenseDto> insert(@RequestBody @Valid ExpenseDto expenseDto, UriComponentsBuilder uriBuilder) {
-        Expense savedExpense = expenseRepository.save(expenseDto.convert());
+    public ResponseEntity<?> insert(@RequestBody @Valid ExpenseForm expenseForm,
+                                    UriComponentsBuilder uriBuilder,
+                                    HttpServletRequest request) {
+        Long tenant = tokenServices.getTenant(request);
+        expenseForm.setTenant(tenant);
+        Expense savedExpense = expenseRepository.save(new Expense(expenseForm));
         URI uri = uriBuilder.path("/expense/{id}")
                 .buildAndExpand(savedExpense.getId())
                 .toUri();
         return ResponseEntity.created(uri).body(new ExpenseDto(savedExpense));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Transactional
     @CacheEvict(value = {"expenseList", "years"}, allEntries = true)
-    public ResponseEntity<ExpenseDto> update(@RequestBody @Valid ExpenseDto expenseDto) {
-        Optional<Expense> expenseOptional = expenseRepository.findById(expenseDto.getApiId());
-        if (expenseOptional.isPresent()) {
-            Expense expenseupdated = expenseDto.update(expenseRepository);
-            return ResponseEntity.ok(new ExpenseDto(expenseupdated));
+    public ResponseEntity<ExpenseDto> update(@PathVariable Long id,
+                                             @RequestBody @Valid ExpenseForm expenseForm,
+                                             HttpServletRequest request) {
+        Optional<Expense> optionalExpense = expenseRepository.findById(id);
+        if (optionalExpense.isPresent()) {
+            Long tenant = tokenServices.getTenant(request);
+            if (optionalExpense.get().isTenantNotEquals(tenant))
+                throw new TenantNotEqualsException(TENANT_NOT_EQUALS);
+            Expense expenseUpdated = expenseForm.update(expenseRepository, id);
+            return ResponseEntity.ok(new ExpenseDto(expenseUpdated));
         }
-        return ResponseEntity.notFound().build();
+        throw new EntityNotFoundException(ENTITY_NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     @CacheEvict(value = {"expenseList", "years"}, allEntries = true)
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        Optional<Expense> expense = expenseRepository.findById(id);
-        if (expense.isPresent()) {
+    public ResponseEntity<?> delete(@PathVariable Long id,
+                                    HttpServletRequest request) {
+        Optional<Expense> optionalExpense = expenseRepository.findById(id);
+        if (optionalExpense.isPresent()) {
+            Long tenant = tokenServices.getTenant(request);
+            if (optionalExpense.get().isTenantNotEquals(tenant))
+                throw new TenantNotEqualsException(TENANT_NOT_EQUALS);
             expenseRepository.deleteById(id);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.notFound().build();
+        throw new EntityNotFoundException(ENTITY_NOT_FOUND);
     }
 
 }

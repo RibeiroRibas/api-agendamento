@@ -1,6 +1,7 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import br.com.beautystyle.agendamento.controller.dto.JobDto;
+import br.com.beautystyle.agendamento.controller.form.JobEventForm;
+import br.com.beautystyle.agendamento.controller.form.JobForm;
 import br.com.beautystyle.agendamento.repository.EventRepository;
 import br.com.beautystyle.agendamento.repository.JobRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,64 +20,62 @@ public class Job {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long jobId;
+    private Long id;
     @NotNull
     private String name;
     @NotNull
-    private BigDecimal valueOfJob;
+    private BigDecimal price;
     @NotNull
     private LocalTime durationTime;
-    @ManyToMany(mappedBy = "jobList")
+    @ManyToMany(mappedBy = "jobs")
     @JsonIgnore
     private List<Event> eventList = new ArrayList<>();
     @NotNull
-    private Long companyId;
+    private Long tenant;
 
-    public static Set<Job> convert(Set<JobDto> jobDtoList) {
-        return jobDtoList.stream().map(Job::new).collect(Collectors.toSet());
+    public Job() {}
+
+    public Job(JobEventForm jobEventForm) {
+        this.id = jobEventForm.getApiId();
     }
 
-    public Job (JobDto jobDto){
-        this.jobId = jobDto.getApiId();
-        this.name = jobDto.getName();
-        this.companyId = jobDto.getCompanyId();
-        this.valueOfJob = jobDto.getValueOfJob();
-        this.durationTime = jobDto.getDurationTime();
+    public Job(JobForm jobForm) {
+        this.name = jobForm.getName();
+        this.price = jobForm.getPrice();
+        this.durationTime = jobForm.getDurationTime();
+        this.tenant = jobForm.getTenant();
     }
 
-    public Job() {
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setJobId(Long jobId) {
-        this.jobId = jobId;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public Long getCompanyId() {
-        return companyId;
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public void setEventList(List<Event> eventList) {
-        this.eventList = eventList;
+    public void setEventList(Event event) {
+        this.eventList.add(event);
     }
 
     public List<Event> getEventList() {
         return eventList;
     }
 
-    public Long getJobId() {
-        return jobId;
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public BigDecimal getValueOfJob() {
-        return valueOfJob;
+    public BigDecimal getPrice() {
+        return price;
     }
 
     public LocalTime getDurationTime() {
@@ -91,21 +90,29 @@ public class Job {
         this.name = name;
     }
 
-    public void setValueOfJob(BigDecimal valueOfJob) {
-        this.valueOfJob = valueOfJob;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
     public void removeAssociation(JobRepository jobRepository, EventRepository eventRepository) {
-        Job jobById = jobRepository.getById(this.jobId);
+        Job jobById = jobRepository.getById(this.id);
         jobById.getEventList().forEach(event -> {
-            Event eventById = eventRepository.getById(event.getEventId());
-            eventById.getJobList().remove(jobById);
+            Event eventById = eventRepository.getById(event.getId());
+            eventById.getJobs().remove(jobById);
         });
         jobById.getEventList().clear();
     }
 
-    public void removeEvent(JobRepository jobRepository, Event event) {
-        Job jobById = jobRepository.getById(this.jobId);
-        jobById.getEventList().remove(event);
+    public LocalTime sumJobsDurationTime(LocalTime jobsDurationTime) {
+        return jobsDurationTime.plusHours(this.durationTime.getHour())
+                .plusMinutes(this.durationTime.getMinute());
+    }
+
+    public boolean isTenantNotEquals(Long tenant) {
+        return !this.tenant.equals(tenant);
     }
 }
