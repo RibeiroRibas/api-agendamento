@@ -6,6 +6,7 @@ import br.com.beautystyle.agendamento.controller.exceptions.TenantNotEqualsExcep
 import br.com.beautystyle.agendamento.controller.form.ExpenseForm;
 import br.com.beautystyle.agendamento.model.entity.Expense;
 import br.com.beautystyle.agendamento.repository.ExpenseRepository;
+import javax.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.EntityNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
@@ -43,7 +44,7 @@ public class ExpenseController {
                                                         HttpServletRequest request) {
         Long tenant = tokenServices.getTenant(request);
         List<Expense> expenseList =
-                expenseRepository.findByTenantEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
+                expenseRepository.findByTenantEqualsAndDateGreaterThanEqualAndDateLessThanEqual(
                         tenant, startDate, endDate);
         return ResponseEntity.ok(ExpenseDto.convert(expenseList));
     }

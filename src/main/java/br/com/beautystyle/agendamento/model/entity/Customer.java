@@ -1,17 +1,19 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import br.com.beautystyle.agendamento.controller.form.CustomerEventForm;
 import br.com.beautystyle.agendamento.controller.form.CustomerForm;
-import br.com.beautystyle.agendamento.repository.EventRepository;
+import br.com.beautystyle.agendamento.repository.CustomerRepository;
+import br.com.beautystyle.agendamento.repository.ScheduleRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(indexes = @Index(columnList = "tenant"))
 public class Customer {
 
     @Id
@@ -23,60 +25,35 @@ public class Customer {
     @JsonIgnore
     @OneToMany(mappedBy = "customer",
             fetch = FetchType.LAZY)
-    private List<Event> events = new ArrayList<>();
+    private List<Schedule> schedules = new ArrayList<>();
     @OneToOne(mappedBy = "customer")
     private UserCustomer userCustomer;
+    @NotNull
     private Long tenant;
 
     public Customer() {
-
     }
 
-    public Customer(CustomerForm customerForm) {
-        this.name = customerForm.getName();
-        this.tenant = customerForm.getTenant();
-        this.phone = customerForm.getPhone();
+    public Customer(Long id) {
+        this.id = id;
     }
 
-    public Customer(CustomerEventForm costumer) {
-        this.id = costumer.getApiId();
-    }
-
-    public Customer(String name, String phone) {
+    public Customer(String name, String phone, Long tenant) {
         this.name = name;
         this.phone = phone;
-    }
-
-    public static List<Customer> convert(List<CustomerForm> clients) {
-        return clients.stream().map(Customer::new).collect(Collectors.toList());
-    }
-
-    public Long getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Long tenant) {
         this.tenant = tenant;
     }
 
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEventList(Event event) {
-        this.events.add(event);
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public Customer(CustomerForm customerForm, Long tenant) {
+        this.name = customerForm.getName();
+        this.tenant = tenant;
+        this.phone = customerForm.getPhone();
     }
 
     public Long getId() {
-        return id;
-    }
+        if (id != null) return id;
 
-    public void setName(String name) {
-        this.name = name;
+        return -1L;
     }
 
     public void setId(Long id) {
@@ -87,20 +64,24 @@ public class Customer {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getPhone() {
         return phone;
     }
 
-    public void removeEventAssociation(EventRepository eventRepository) {
-        events.forEach(event -> {
-            Event eventToUpdate = eventRepository.getById(event.getId());
-            eventToUpdate.setCostumer(null);
-        });
-        this.events.clear();
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 
     public UserCustomer getUserCustomer() {
@@ -111,19 +92,29 @@ public class Customer {
         this.userCustomer = userCustomer;
     }
 
-    public void addEventAssociation(Event newEvent) {
-        this.events.add(newEvent);
-    }
-
-    public boolean isUserIdNotNullOrEquals(Long userId) {
-        return userCustomer == null || userCustomer.isUserIdNotEquals(userId);
-    }
-
-    public boolean isTenantNotEquals(Long tenant) {
-        return !this.tenant.equals(tenant);
-    }
-
     public boolean isUserCostumerNotNull() {
         return userCustomer != null;
     }
+
+    public Long getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
+    }
+
+    public void removeAssociation(Schedule schedule) {
+        this.schedules.remove(schedule);
+    }
+
+    public static List<Customer> convert(List<CustomerForm> customers, Long tenant) {
+        return customers.stream().map(customer -> new Customer(customer,tenant)).collect(Collectors.toList());
+    }
+
+    public void update(CustomerForm customerForm) {
+        this.name = customerForm.getName();
+        this.phone = customerForm.getPhone();
+    }
+
 }

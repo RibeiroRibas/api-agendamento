@@ -1,8 +1,6 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
 import br.com.beautystyle.agendamento.model.entity.Expense;
-import br.com.beautystyle.agendamento.model.RepeatOrNot;
-import br.com.beautystyle.agendamento.repository.ExpenseRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,7 +14,7 @@ public class ExpenseDto {
     private BigDecimal value;
     private LocalDate expenseDate;
     private String category;
-    private RepeatOrNot repeatOrNot;
+    private boolean repeat;
     private Long tenant;
 
     public ExpenseDto() {
@@ -26,9 +24,9 @@ public class ExpenseDto {
         this.apiId = savedExpense.getId();
         this.description = savedExpense.getDescription();
         this.value = savedExpense.getValue();
-        this.expenseDate = savedExpense.getExpenseDate();
-        this.category = savedExpense.getCategory();
-        this.repeatOrNot = savedExpense.getRepeatOrNot();
+        this.expenseDate = savedExpense.getDate();
+        this.category = savedExpense.getCategory().getName();
+        this.repeat = savedExpense.isRepeat();
         this.tenant = savedExpense.getTenant();
     }
 
@@ -60,10 +58,6 @@ public class ExpenseDto {
         this.category = category;
     }
 
-    public void setRepeatOrNot(RepeatOrNot repeatOrNot) {
-        this.repeatOrNot = repeatOrNot;
-    }
-
     public Long getTenant() {
         return tenant;
     }
@@ -84,33 +78,16 @@ public class ExpenseDto {
         return expenseDate;
     }
 
+    public boolean isRepeat() {
+        return repeat;
+    }
 
-    public RepeatOrNot getRepeatOrNot() {
-        return repeatOrNot;
+    public void setRepeat(boolean repeat) {
+        this.repeat = repeat;
     }
 
     public static List<ExpenseDto> convert(List<Expense> expenseList) {
         return expenseList.stream().map(ExpenseDto::new).collect(Collectors.toList());
     }
 
-    public Expense convert(){
-        Expense expense = new Expense();
-        expense.setRepeatOrNot(this.repeatOrNot);
-        expense.setValue(this.value);
-        expense.setCategory(this.category);
-        expense.setDescription(this.description);
-        expense.setExpenseDate(this.expenseDate);
-        expense.setTenant(this.tenant);
-        return expense;
-    }
-
-    public Expense update(ExpenseRepository expenseRepository) {
-            Expense expense = expenseRepository.getById(this.apiId);
-            expense.setDescription(this.description);
-            expense.setCategory(this.category);
-            expense.setExpenseDate(this.expenseDate);
-            expense.setValue(this.value);
-            expense.setRepeatOrNot(this.repeatOrNot);
-            return expense;
-    }
 }

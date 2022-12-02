@@ -1,98 +1,55 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
-import br.com.beautystyle.agendamento.model.entity.Event;
 import br.com.beautystyle.agendamento.model.entity.Schedule;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class EventDto {
 
-    private Long apiId;
-    private LocalDate eventDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private BigDecimal value;
-    private Long tenant;
-    private boolean hasPaymentReceived;
+    private ScheduleDto event;
+    private CustomerDto customer;
+    private Set<JobDto> jobs;
+
+
+    public EventDto(Schedule schedule) {
+        this.event = new ScheduleDto(schedule);
+        this.customer = new CustomerDto(schedule.getCustomer());
+        this.jobs = JobDto.convert(schedule.getJobs());
+    }
 
     public EventDto() {
     }
 
-    public EventDto(Event event) {
-        this.apiId = event.getId();
-        this.eventDate = event.getEventDate();
-        this.startTime = event.getStartTime();
-        this.endTime = event.getEndTime();
-        this.value = event.getValue();
-        this.tenant = event.getTenant();
-        this.hasPaymentReceived = event.isHasPaymentReceived();
+    public static List<EventDto> convert(List<Schedule> schedules) {
+        List<EventDto> eventsFinalDto = new ArrayList<>();
+        schedules.forEach(schedule -> eventsFinalDto.add(new EventDto(schedule)));
+        return eventsFinalDto;
     }
 
-    public EventDto(Schedule schedule) {
-        this.apiId = schedule.getId();
-        this.eventDate = schedule.getDate();
-        this.startTime = schedule.getStartTime();
-        this.endTime = schedule.getEndTime();
-        this.value = schedule.getPrice();
-        this.tenant = schedule.getTenant();
-        this.hasPaymentReceived = schedule.isHasPaymentReceived();
+    public ScheduleDto getEvent() {
+        return event;
     }
 
-    public Long getApiId() {
-        return apiId;
+    public void setEvent(ScheduleDto event) {
+        this.event = event;
     }
 
-    public void setApiId(Long apiId) {
-        this.apiId = apiId;
+    public CustomerDto getCustomer() {
+        return customer;
     }
 
-    public LocalDate getEventDate() {
-        return eventDate;
+    public void setCustomer(CustomerDto customer) {
+        this.customer = customer;
     }
 
-    public void setEventDate(LocalDate eventDate) {
-        this.eventDate = eventDate;
+    public Set<JobDto> getJobs() {
+        return jobs;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
+    public void setJobs(Set<JobDto> jobs) {
+        this.jobs = jobs;
     }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public void setHasPaymentReceived(boolean hasPaymentReceived) {
-        this.hasPaymentReceived = hasPaymentReceived;
-    }
-
-    public Long getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Long tenant) {
-        this.tenant = tenant;
-    }
-
-    public boolean isHasPaymentReceived() {
-        return hasPaymentReceived;
-    }
 }

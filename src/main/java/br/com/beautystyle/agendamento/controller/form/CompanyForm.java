@@ -5,9 +5,7 @@ import br.com.beautystyle.agendamento.model.entity.Address;
 import br.com.beautystyle.agendamento.model.entity.BusinessHours;
 import br.com.beautystyle.agendamento.model.entity.Company;
 import br.com.beautystyle.agendamento.repository.CompanyRepository;
-
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;

@@ -2,9 +2,7 @@ package br.com.beautystyle.agendamento.controller;
 
 import br.com.beautystyle.agendamento.config.security.TokenServices;
 import br.com.beautystyle.agendamento.controller.dto.ReportDto;
-import br.com.beautystyle.agendamento.model.entity.Event;
 import br.com.beautystyle.agendamento.model.entity.Expense;
-import br.com.beautystyle.agendamento.repository.EventRepository;
 import br.com.beautystyle.agendamento.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,8 +23,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/report")
 public class ReportController {
 
-    @Autowired
-    private EventRepository eventRepository;
 
     @Autowired
     private ExpenseRepository expenseRepository;
@@ -40,13 +36,13 @@ public class ReportController {
                                                              HttpServletRequest request) {
         Long tenant = tokenServices.getTenant(request);
         List<Expense> expenses =
-                expenseRepository.findByTenantEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(
+                expenseRepository.findByTenantEqualsAndDateGreaterThanEqualAndDateLessThanEqual(
                         tenant, startDate, endDate);
         List<ReportDto> report = ReportDto.convertExpenseList(expenses);
-        List<Event> events =
-                eventRepository.findByTenantEqualsAndEventDateGreaterThanEqualAndEventDateLessThanEqual(
-                        tenant, startDate, endDate);
-        report.addAll(ReportDto.convertEventList(events));
+//        List<Event> events =
+//                eventRepository.findByTenantEqualsAndEventDateGreaterThanEqualAndEventDateLessThanEqual(
+//                        tenant, startDate, endDate);
+//        report.addAll(ReportDto.convertEventList(events));
         return ResponseEntity.ok(report);
     }
 
@@ -54,10 +50,10 @@ public class ReportController {
     public ResponseEntity<List<ReportDto>> getReportByDate(@DateTimeFormat(pattern = "yyyy-MM-dd") @PathVariable LocalDate date,
                                                            HttpServletRequest request) {
         Long tenant = tokenServices.getTenant(request);
-        List<Expense> expenses = expenseRepository.findByTenantAndExpenseDate(tenant, date);
+        List<Expense> expenses = expenseRepository.findByTenantAndDate(tenant, date);
         List<ReportDto> report = ReportDto.convertExpenseList(expenses);
-        List<Event> events = eventRepository.findByEventDateAndTenant(date, tenant);
-        report.addAll(ReportDto.convertEventList(events));
+//        List<Event> events = eventRepository.findByEventDateAndTenant(date, tenant);
+//        report.addAll(ReportDto.convertEventList(events));
         return ResponseEntity.ok(report);
     }
 
@@ -66,8 +62,8 @@ public class ReportController {
         Long tenant = tokenServices.getTenant(request);
         List<LocalDate> expenseDates = expenseRepository.getYearsListByTenant(tenant);
         List<String> years = getYears(expenseDates);
-        List<LocalDate> eventDates = eventRepository.getYearsListByTenant(tenant);
-        years.addAll(getYears(eventDates));
+      //  List<LocalDate> eventDates = eventRepository.getYearsListByTenant(tenant);
+      //  years.addAll(getYears(eventDates));
         years = years.stream().distinct().collect(Collectors.toList());
         return ResponseEntity.ok(years);
     }

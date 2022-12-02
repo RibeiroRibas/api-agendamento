@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense,Long> {
 
-    @Query("SELECT e.expenseDate FROM Expense e WHERE e.tenant =:tenant")
+    @Query("SELECT e.date FROM Expense e WHERE e.tenant =:tenant")
     List<LocalDate> getYearsListByTenant(Long tenant);
 
-    List<Expense> findByTenantEqualsAndExpenseDateGreaterThanEqualAndExpenseDateLessThanEqual(Long tenant, LocalDate startDate, LocalDate endDate);
+    List<Expense> findByTenantEqualsAndDateGreaterThanEqualAndDateLessThanEqual(Long tenant, LocalDate startDate, LocalDate endDate);
 
-    List<Expense> findByTenantAndExpenseDate(Long id, LocalDate date);
+    List<Expense> findByTenantAndDate(Long id, LocalDate date);
 }

@@ -1,7 +1,6 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
 import br.com.beautystyle.agendamento.model.entity.Customer;
-import br.com.beautystyle.agendamento.model.entity.CustomerTest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,16 +17,6 @@ public class CustomerDto {
     }
 
     public CustomerDto(Customer customer) {
-        if(customer != null){
-            this.apiId = customer.getId();
-            this.name = customer.getName();
-            this.phone = customer.getPhone();
-            this.isUser = customer.isUserCostumerNotNull();
-            this.tenant = customer.getTenant();
-        }
-    }
-
-    public CustomerDto(CustomerTest customer) {
         if(customer != null){
             this.apiId = customer.getId();
             this.name = customer.getName();
@@ -80,8 +69,5 @@ public class CustomerDto {
     public void setTenant(Long tenant) {
         this.tenant = tenant;
     }
-
-
-
 
 }

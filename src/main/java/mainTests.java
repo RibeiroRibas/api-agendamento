@@ -1,13 +1,10 @@
+import br.com.beautystyle.agendamento.repository.JobRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.jni.Local;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class mainTests {
@@ -23,5 +20,11 @@ public class mainTests {
 
         String join = StringUtils.join(daysOfWeek.toArray(), ",");
         System.out.println(join);
+        JobRepository repository = null;
+        teste(repository);
+    }
+
+    static void teste(JpaRepository<?, Long> repository) {
+        repository.deleteById(1L);
     }
 }

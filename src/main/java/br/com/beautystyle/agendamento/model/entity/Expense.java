@@ -1,7 +1,7 @@
 package br.com.beautystyle.agendamento.model.entity;
 
 import br.com.beautystyle.agendamento.controller.form.ExpenseForm;
-import br.com.beautystyle.agendamento.model.RepeatOrNot;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(indexes = @Index(columnList = "tenant"))
 public class Expense {
 
     @Id
@@ -18,12 +19,14 @@ public class Expense {
     @NotNull
     private BigDecimal value;
     @NotNull
-    private LocalDate expenseDate;
+    private LocalDate date;
+    @OneToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     @NotNull
-    private String category;
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private RepeatOrNot repeatOrNot;
+    private Category category;
+    @Column(name = "isRepeat", nullable = false)
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private boolean repeat;
     @NotNull
     private Long tenant;
 
@@ -33,14 +36,10 @@ public class Expense {
     public Expense(ExpenseForm expenseForm) {
         this.description = expenseForm.getDescription();
         this.value = expenseForm.getValue();
-        this.expenseDate = expenseForm.getExpenseDate();
-        this.category = expenseForm.getCategory();
-        this.repeatOrNot = expenseForm.getRepeatOrNot();
+        this.date = expenseForm.getExpenseDate();
+        this.category = new Category(expenseForm.getCategoryId());
+        this.repeat = expenseForm.isRepeatOrNot();
         this.tenant = expenseForm.getTenant();
-    }
-
-    public void setRepeatOrNot(RepeatOrNot repeatOrNot) {
-        this.repeatOrNot = repeatOrNot;
     }
 
     public Long getId() {
@@ -55,8 +54,8 @@ public class Expense {
         this.value = value;
     }
 
-    public void setExpenseDate(LocalDate expenseDate) {
-        this.expenseDate = expenseDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public void setId(Long id) {
@@ -71,16 +70,8 @@ public class Expense {
         return value;
     }
 
-    public LocalDate getExpenseDate() {
-        return expenseDate;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
+    public LocalDate getDate() {
+        return date;
     }
 
     public void setTenant(Long companyId) {
@@ -91,11 +82,23 @@ public class Expense {
         return tenant;
     }
 
-    public RepeatOrNot getRepeatOrNot() {
-        return repeatOrNot;
-    }
-
     public boolean isTenantNotEquals(Long tenant) {
         return !this.tenant.equals(tenant);
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public boolean isRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(boolean repeat) {
+        this.repeat = repeat;
     }
 }

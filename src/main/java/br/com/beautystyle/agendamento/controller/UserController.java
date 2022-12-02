@@ -4,8 +4,8 @@ import br.com.beautystyle.agendamento.config.security.TokenServices;
 import br.com.beautystyle.agendamento.controller.form.UserForm;
 import br.com.beautystyle.agendamento.controller.form.UserProfessionalForm;
 import br.com.beautystyle.agendamento.model.entity.*;
-import br.com.beautystyle.agendamento.repository.EventRepository;
 import br.com.beautystyle.agendamento.repository.ProfileRepository;
+import br.com.beautystyle.agendamento.repository.ScheduleRepository;
 import br.com.beautystyle.agendamento.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class UserController {
     private TokenServices tokenServices;
 
     @Autowired
-    private EventRepository eventRepository;
+    private ScheduleRepository scheduleRepository;
 
     @PostMapping("/professional")
     @Transactional
@@ -86,8 +86,8 @@ public class UserController {
         try {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
-                List<Event> events = eventRepository.findByCustomerUserCustomerId(userId);
-                events.forEach(event -> event.removeCostumerAssociation(eventRepository));
+                List<Schedule> schedules = scheduleRepository.findByCustomerUserCustomerId(userId);
+                //schedules.forEach(schedule -> schedule.removeCostumerAssociation(scheduleRepository));
                 userRepository.deleteById(userId);
                 return ResponseEntity.ok().build();
             }

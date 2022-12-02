@@ -1,6 +1,5 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
-import br.com.beautystyle.agendamento.model.entity.Event;
 import br.com.beautystyle.agendamento.model.entity.Expense;
 
 import java.math.BigDecimal;
@@ -21,25 +20,14 @@ public class ReportDto {
     }
 
     public ReportDto(Expense expense) {
-        this.date = expense.getExpenseDate();
+        this.date = expense.getDate();
         this.expenseValue = expense.getValue();
-        this.expenseCategory = expense.getCategory();
+        this.expenseCategory = expense.getCategory().getName();
         this.apiId = expense.getId();
-    }
-
-    public ReportDto(Event event) {
-        this.date = event.getEventDate();
-        this.eventValue = event.getValue();
-        this.clientName = event.getCostumer().getName();
-        this.apiId = event.getId();
     }
 
     public static List<ReportDto> convertExpenseList(List<Expense> expenseList) {
         return expenseList.stream().map(ReportDto::new).collect(Collectors.toList());
-    }
-
-    public static List<ReportDto> convertEventList(List<Event> eventList) {
-        return eventList.stream().map(ReportDto::new).collect(Collectors.toList());
     }
 
     public String getClientName() {

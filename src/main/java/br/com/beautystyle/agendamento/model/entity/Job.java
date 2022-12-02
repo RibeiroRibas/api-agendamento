@@ -1,9 +1,8 @@
 package br.com.beautystyle.agendamento.model.entity;
 
-import br.com.beautystyle.agendamento.controller.form.JobEventForm;
 import br.com.beautystyle.agendamento.controller.form.JobForm;
-import br.com.beautystyle.agendamento.repository.EventRepository;
 import br.com.beautystyle.agendamento.repository.JobRepository;
+import br.com.beautystyle.agendamento.repository.ScheduleRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -16,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(indexes = @Index(columnList = "tenant"))
 public class Job {
 
     @Id
@@ -29,14 +29,11 @@ public class Job {
     private LocalTime durationTime;
     @ManyToMany(mappedBy = "jobs")
     @JsonIgnore
-    private List<Event> eventList = new ArrayList<>();
+    private List<Schedule> schedules = new ArrayList<>();
     @NotNull
     private Long tenant;
 
-    public Job() {}
-
-    public Job(JobEventForm jobEventForm) {
-        this.id = jobEventForm.getApiId();
+    public Job() {
     }
 
     public Job(JobForm jobForm) {
@@ -46,36 +43,28 @@ public class Job {
         this.tenant = jobForm.getTenant();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Long tenant) {
-        this.tenant = tenant;
-    }
-
-    public void setEventList(Event event) {
-        this.eventList.add(event);
-    }
-
-    public List<Event> getEventList() {
-        return eventList;
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public BigDecimal getPrice() {
         return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public LocalTime getDurationTime() {
@@ -86,25 +75,20 @@ public class Job {
         this.durationTime = durationTime;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 
-    public void setEventList(List<Event> eventList) {
-        this.eventList = eventList;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public void removeAssociation(JobRepository jobRepository, EventRepository eventRepository) {
-        Job jobById = jobRepository.getById(this.id);
-        jobById.getEventList().forEach(event -> {
-            Event eventById = eventRepository.getById(event.getId());
-            eventById.getJobs().remove(jobById);
-        });
-        jobById.getEventList().clear();
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
     public LocalTime sumJobsDurationTime(LocalTime jobsDurationTime) {
@@ -112,7 +96,8 @@ public class Job {
                 .plusMinutes(this.durationTime.getMinute());
     }
 
-    public boolean isTenantNotEquals(Long tenant) {
-        return !this.tenant.equals(tenant);
+    public void removeAssociation(Schedule schedule) {
+        this.schedules.remove(schedule);
     }
+
 }

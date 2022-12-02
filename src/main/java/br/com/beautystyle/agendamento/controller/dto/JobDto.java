@@ -1,7 +1,6 @@
 package br.com.beautystyle.agendamento.controller.dto;
 
 import br.com.beautystyle.agendamento.model.entity.Job;
-import br.com.beautystyle.agendamento.model.entity.JobTest;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -16,7 +15,7 @@ public class JobDto {
     private LocalTime durationTime;
     private Long tenant;
 
-    public JobDto(JobTest job) {
+    public JobDto(Job job) {
         this.apiId = job.getId();
         this.name = job.getName();
         this.price = job.getPrice();
@@ -31,15 +30,7 @@ public class JobDto {
     public JobDto() {
     }
 
-    public JobDto(Job job) {
-        this.apiId = job.getId();
-        this.name = job.getName();
-        this.price = job.getPrice();
-        this.durationTime = job.getDurationTime();
-        this.tenant = job.getTenant();
-    }
-
-    public static Set<JobDto> convert(Set<JobTest> jobs) {
+    public static Set<JobDto> convert(Set<Job> jobs) {
         return jobs.stream().map(JobDto::new).collect(Collectors.toSet());
     }
 
@@ -81,14 +72,6 @@ public class JobDto {
 
     public void setTenant(Long tenant) {
         this.tenant = tenant;
-    }
-
-    public Job convertList() {
-        Job job = new Job();
-        job.setName(this.name);
-        job.setDurationTime(this.durationTime);
-        job.setPrice(this.price);
-        return job;
     }
 
 }

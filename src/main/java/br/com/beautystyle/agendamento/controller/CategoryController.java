@@ -5,6 +5,7 @@ import br.com.beautystyle.agendamento.controller.exceptions.TenantNotEqualsExcep
 import br.com.beautystyle.agendamento.controller.form.CategoryForm;
 import br.com.beautystyle.agendamento.model.entity.Category;
 import br.com.beautystyle.agendamento.repository.CategoryRepository;
+import javax.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
@@ -48,7 +48,7 @@ public class CategoryController {
         categoryForm.setTenant(tokenServices.getTenant(request));
         Category savedCategory = categoryRepository.save(new Category(categoryForm));
         URI uri = uriBuilder.path("/category/{id}")
-                .buildAndExpand(savedCategory.getApiId())
+                .buildAndExpand(savedCategory.getId())
                 .toUri();
         return ResponseEntity.created(uri).body(savedCategory);
     }
